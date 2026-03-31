@@ -1,0 +1,351 @@
+  <!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>pero</title>
+
+<style>
+:root{
+  --bg1:#141218;
+  --bg2:#070709;
+  --panel:#0f0f12;
+  --muted:#9aa0a6;
+  --accent:#ff6b81;
+}
+*{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;}
+html,body{
+  height:100%;
+  margin:0;
+  background:radial-gradient(circle at top, var(--bg1), var(--bg2));
+  color:#eef1f6;
+  overflow:hidden;
+}
+
+.stars{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.stars span{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,0.85);
+  box-shadow:0 0 6px rgba(255,255,255,0.6);
+  will-change:transform,opacity;
+}
+@keyframes starDrift{
+  from{transform:translateY(120vh)}
+  to{transform:translateY(-20vh)}
+}
+
+.scene{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:1;
+}
+.scene.active{display:flex}
+
+.envelope{
+  width:300px;
+  height:190px;
+  border-radius:14px;
+  background:linear-gradient(135deg, blue, ivory);
+  box-shadow:0 30px 70px rgba(0,0,0,.6);
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.envelope .label{
+  color:var(--muted);
+  letter-spacing:.6px;
+}
+.envelope .flap{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg, ivory, blue);
+  clip-path:polygon(0 0,100% 0,50% 62%);
+  transform-origin:top;
+  transition:transform .7s cubic-bezier(.2,.9,.25,1);
+}
+.envelope.open .flap{
+  transform:perspective(600px) rotateX(180deg) translateY(-8%);
+}
+
+.panel{
+  width:100%;
+  max-width:540px;
+  border-radius:16px;
+  background:linear-gradient(135deg,var(--panel), blue, black);
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+  padding:22px;
+  max-height:78vh;
+  overflow:auto;
+}
+.text-line{
+  margin:0 0 12px 0;
+  line-height:1.6;
+  color:white;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .40s ease, transform .34s ease;
+}
+.text-line.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.btn-continue{
+  display:block;
+  margin:16px auto 0;
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.card{
+  width:100%;
+  max-width:420px;
+  padding:26px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--panel), blue, black);
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+  text-align:center;
+}
+.question-text{
+  min-height:110px;
+  line-height:1.7;
+  margin-bottom:12px;
+  font-size:15px;
+  text-align:left;
+}
+.button-area{
+  position:relative;
+  height:78px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.btn{
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+}
+.btn.yes{
+  background:linear-gradient(135deg,#ff6b81,#d94a63);
+  color:#fff;
+  transition:relative;
+  z-index:1;
+}
+.btn.no{
+  background:#222;
+  color:var(--muted);
+  position:fixed;
+  left:20px;
+
+  .text
+}
+  
+.thanks{text-align:center;max-width:480px}
+.thanks h1{font-size:22px;margin-bottom:8px}
+.muted-note{color:var(--muted)}
+
+@media(max-width:420px){
+  .envelope{width:88%;height:160px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="scene active" id="sceneEnvelope">
+  <h1>click</h1>
+  <div class="envelope" id="envelope">
+    <div class="flap"></div>
+    <div class="label"></div>
+  </div>
+</div>
+
+<div class="scene" id="sceneIntro">
+  <div class="panel">
+    <div id="introText"></div>
+    <button id="continueBtn1" class="btn-continue" style="display:none">Continue</button>
+  </div>
+</div>
+
+<div class="scene" id="sceneLetter">
+  <div class="panel">
+    <div id="letterText"></div>
+    <button id="continueBtn2" class="btn-continue" style="display:none">Continue</button>
+  </div>
+</div>
+
+<div class="scene" id="sceneQuestion">
+  <div class="card">
+    <div class="question-text" id="questionText"></div>
+    <div class="button-area" id="buttonArea" style="visibility:hidden">
+      <button class="btn no" id="noBtn">No</button>
+      <button class="btn yes" id="yesBtn">Yes</button>
+    </div>
+    <div class="muted-note" id="noteArea"></div>
+  </div>
+</div>
+
+<div class="scene" id="sceneThanks">
+  <div class="panel thanks">
+    <h1>Well... That's what i wanna say </h1>
+    <p class="muted-note">
+      this might be the most effort thing i've ever done.
+      but still it's just a simple web, only took me a month.
+      lo siento, kalo menurut u i itu boring, sok asik, and annoying.
+      mungkin juga mi jokes ga lucu o garing bagi u atau bahkan annoying buat u.
+      i ga maksa kok u harus jawab sekarang, i'll let u have a time to think bout it.  
+      apapun jawabannya, i hargain kejujuran u.
+      kalo ada yang ingin u tanyakan, silahkan tanya. i'll answer everything u ask.
+      désolé kalo i wasting ur time to read this nonsense shit. hehehe :)
+    </p>
+    <p></p>
+    <h1>Gracias for reading this, mafia yupi</h1>
+    <p></p>
+    <p class="muted-note">gomen kalo bahasa i campur-campur kayak gado-gado wkwkwk</p>
+  </div>
+</div>
+
+<script>
+const starsRoot = document.getElementById('stars');
+const STAR_COUNT = 80;
+
+for(let i=0;i<STAR_COUNT;i++){
+  const s=document.createElement('span');
+  const size=(Math.random()*2.8+1.4).toFixed(2); // BIGGER
+  s.style.width=size+'px';
+  s.style.height=size+'px';
+  s.style.left=Math.random()*100+'vw';
+  s.style.top=Math.random()*100+'vh';
+  s.style.opacity=(Math.random()*0.4+0.6).toString(); // WHITER
+  const dur=(8+Math.random()*12).toFixed(1);
+  s.style.animation=`starDrift ${dur}s linear ${-Math.random()*20}s infinite`;
+  starsRoot.appendChild(s);
+}
+
+const switchScene=(a,b)=>{
+  document.getElementById(a).classList.remove('active');
+  document.getElementById(b).classList.add('active');
+};
+
+function typeLines(container, lines){
+  return new Promise(res=>{
+    let i=0;
+    const next=()=>{
+      if(i>=lines.length){res();return;}
+      const p=document.createElement('p');
+      p.className='text-line';
+      container.appendChild(p);
+      const words=lines[i].split(' ');
+      let w=0;
+      const t=()=>{
+        if(w>=words.length){
+          p.classList.add('visible');
+          i++; setTimeout(next,400); return;
+        }
+        p.innerHTML+=(w?' ':'')+words[w++];
+        container.scrollTop=container.scrollHeight;
+        setTimeout(t,80+Math.random()*120);
+      };
+      t();
+    };
+    next();
+  });
+}
+
+const envelope=document.getElementById('envelope');
+envelope.onclick=async()=>{
+  envelope.classList.add('open');
+  await new Promise(r=>setTimeout(r,650));
+  switchScene('sceneEnvelope','sceneIntro');
+  await typeLines(document.getElementById('introText'),[
+    "hey naila (mafia yupi)",
+    "there's something i wanna say (kinda banyak juga sih)",
+    "u could read it slowly",
+    "no need to rush any crack",
+    "i kadang pake spanyol jadi mungkin ini membantu. 'y' artinya 'dan'. 'o' artinya 'atau'"
+  ]);
+  continueBtn1.style.display='block';
+};
+
+continueBtn1.onclick=async()=>{
+  switchScene('sceneIntro','sceneLetter');
+  await typeLines(document.getElementById('letterText'),[
+    "Bueno... me gustas",
+    "sebenarnya i udah suka u dari kelas 10",
+    "pero baru sekarang aja punya nyali buat mulai ngobrol mwehehehe",
+    "fyi, u cewek pertama yang bikin i ngerasain it-is-called butterflies in the stomach",
+    "i sampe search 30 menit buat nyari tau apa itu butterflies in the stomach",
+    "well i always had that feeling... skipping a beat everytime i see u (i ain't being a creep or some' that)",
+    "apalagi pas i negur u di jalan itu 'mafia yupi', my mind litrally goes blank for a sec",
+    "bruh i can't even think straight",
+    "ur also  the first girl that ever said goodnight to me",
+    "and the best part is when u said 'morning so' that simple text made me really happy, really made me smile.",
+    "maybe for u it's just a simple morning, but for me that's my first time someone ever said morning",
+    "maybe u were just being friendly, but still it makes me muy filez",
+    "the funniest part when u said 'pasti ada cewe yg u suka' well... it's u (i lumayan nahan ketawa juga pas bacanya)",
+    "apalagi pas u bilang 'pepet terus' yaa i lagi pepet u sih wkwkwk (i ketawa pas baca itu pertama kali, heck that was funny)",
+    "pas i tanya kalo misal dia ga suka gimana, y u jawab bikin suka... yaa im tryin' hahaha",
+    "even though u said u don't wanna get in any relationship. im still tryin, i'll keep trying",
+    "menyerah? aku menyerah? cih tidak akan",
+    "sebenernya i juga ga nyangka juga we bisa berteman like that wkwkwk (yeuuu)",
+    "banyak juga ya kita chatan, sudah 27.000 pesan, bukan text tpi beneran pesan. shit that was a lot, too much indeed",
+    "ga pernah i chatan sama cwe sebanyak itu jir",
+    "sumpah maaf u jadi risih banget karena berita itu, i didnt know how tf they even figure it out",
+    "since that you've never send me anymore of ur pap huh, well i kinda missed it tho... (a lot indeed) hehehe :/",
+    "(jirlah gak bisa pasang emot di html XD)"
+  ]);
+  continueBtn2.style.display='block';
+};
+
+continueBtn2.onclick=async()=>{
+  switchScene('sceneLetter','sceneQuestion');
+  await typeLines(document.getElementById('questionText'),[
+    "so yea…",
+    "sudah mikir lama soal ini",
+    "i know i ain't that good, attractive, funny",
+    "i know im just a boring and annoying person",
+    "but i ain't like those boys, i won't disappear if there's a problem, imma solve it",
+    "pero they said 'the worse she can say is no' so i'll give it a shot",
+    "no sé how to say it... but..",
+    "¿podría ser este idiota tu novio?",
+    "or we should pdkt first?",
+    "well i hope you'd give me a chance, just one, literally one chance?",
+    "promise i'll be a goodboy"
+  ]);
+  buttonArea.style.visibility='visible';
+};
+
+let scale=1;
+noBtn.onclick=()=>{
+  scale=Math.min(2.2,scale+0.15);
+  yesBtn.style.transform=`scale(${scale})`;
+  noBtn.style.left=Math.random()*120+'px';
+};
+yesBtn.onclick=()=>switchScene('sceneQuestion','sceneThanks');
+</script>
+
+</body>
+  </html>
